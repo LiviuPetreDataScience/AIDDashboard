@@ -1,0 +1,26 @@
+# .NET build output
+bin/
+obj/
+publish/
+*.user
+
+# Local SQLite database files
+*.db
+*.db-shm
+*.db-wal
+
+# Node / Vite
+node_modules/
+src/web/dist/
+
+# Generated SPA assets in the API (produced on publish)
+src/AidDashboard.Api/wwwroot/
+
+# IDE
+.vs/
+.idea/
+*.suo
+
+# Local secrets / environment
+*.env
+appsettings.*.local.json

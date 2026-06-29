@@ -1,0 +1,8 @@
+# Normalize line endings: store text as LF in the repo, check out native on each platform.
+* text=auto
+
+# Keep binary assets untouched.
+*.docx binary
+*.jpg binary
+*.png binary
+*.svg text

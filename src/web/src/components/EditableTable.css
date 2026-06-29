@@ -1,0 +1,33 @@
+.editable-table {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.editable-table-toolbar {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.editable-table-toolbar .grid-search {
+  max-width: 320px;
+}
+
+.editable-table-grid {
+  flex: 1;
+  min-height: 420px;
+}
+
+.grid-delete-button {
+  border: none;
+  background: transparent;
+  color: var(--color-danger);
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0 0.25rem;
+}
+.grid-delete-button:hover {
+  background: transparent;
+  color: var(--color-accent-hover);
+}
