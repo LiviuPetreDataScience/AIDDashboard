@@ -134,39 +134,4 @@ export function ReferenceSelect({
   );
 }
 
-/** Multi-select checkbox group over a reference list, storing an array of item ids. */
-export function MultiCheckboxGroup({
-  items,
-  values,
-  onChange,
-  disabled,
-}: {
-  items: ReferenceItem[];
-  values: number[];
-  onChange: (values: number[]) => void;
-  disabled: boolean;
-}) {
-  function toggle(id: number, checked: boolean) {
-    if (checked) {
-      onChange([...values, id]);
-    } else {
-      onChange(values.filter((value) => value !== id));
-    }
-  }
-
-  return (
-    <div className="checkbox-group">
-      {items.map((item) => (
-        <label key={item.id} className="checkbox-option">
-          <input
-            type="checkbox"
-            checked={values.includes(item.id)}
-            disabled={disabled}
-            onChange={(event) => toggle(item.id, event.target.checked)}
-          />
-          {item.name}
-        </label>
-      ))}
-    </div>
-  );
-}
+// Multi-select fields use the dedicated MultiSelectDropdown component.

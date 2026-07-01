@@ -20,6 +20,13 @@ export const aidGridTheme = themeQuartz.withParams({
   borderColor: readCssVariable('--color-border', '#d8dae0'),
   foregroundColor: readCssVariable('--color-text', '#1f2430'),
   fontFamily: 'inherit',
+  fontSize: 13,
+  headerFontSize: 13,
   headerFontWeight: 600,
   rowHoverColor: readCssVariable('--color-surface-alt', '#f0f1f4'),
+  // Vertical lines between body cells so columns are clearly delineated.
+  columnBorder: true,
+  wrapperBorder: true,
+  // Hide the little column resize-handle bars in the header.
+  headerColumnResizeHandleHeight: 0,
 });

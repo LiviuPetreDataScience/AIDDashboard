@@ -1,14 +1,23 @@
 import { apiClient } from './client';
 import type {
   AccountOverall,
+  AccountServiceRow,
   AccountSummary,
+  AutomationFact,
+  AutomationProfile,
   AutomationRow,
+  ChatMessage,
+  ChatReply,
+  BreadcrumbItem,
   ContractualLanguageCell,
   CountryRow,
   LoginResult,
   OpportunityRow,
   ReferenceItem,
   ReferenceType,
+  ServiceCatalogItem,
+  ServiceLeaf,
+  ServiceNodeKind,
   SlaKpiRow,
   StaffingCell,
   StaffingModelType,
@@ -105,6 +114,33 @@ export const slaKpiApi = {
     apiClient.put(`/accounts/${accountId}/sla-kpis`, rows),
 };
 
+// ---- Services hierarchy (catalog) ----
+export const serviceCatalogApi = {
+  children: (parentId?: number | null, includeInactive = false) =>
+    apiClient
+      .get<ServiceCatalogItem[]>('/service-catalog/children', {
+        params: { parentId: parentId ?? undefined, includeInactive },
+      })
+      .then((r) => r.data),
+  breadcrumb: (id: number) =>
+    apiClient.get<BreadcrumbItem[]>(`/service-catalog/${id}/breadcrumb`).then((r) => r.data),
+  leaves: (includeInactive = false) =>
+    apiClient.get<ServiceLeaf[]>('/service-catalog/leaves', { params: { includeInactive } }).then((r) => r.data),
+  create: (request: { parentId: number | null; name: string; kind: ServiceNodeKind }) =>
+    apiClient.post<ServiceCatalogItem>('/service-catalog', request).then((r) => r.data),
+  update: (id: number, request: { name: string; sortOrder: number; isActive: boolean }) =>
+    apiClient.put(`/service-catalog/${id}`, request),
+  remove: (id: number) => apiClient.delete(`/service-catalog/${id}`),
+};
+
+// ---- Services tab (per account) ----
+export const accountServicesApi = {
+  get: (accountId: number) =>
+    apiClient.get<AccountServiceRow[]>(`/accounts/${accountId}/services`).then((r) => r.data),
+  save: (accountId: number, rows: AccountServiceRow[]) =>
+    apiClient.put(`/accounts/${accountId}/services`, rows),
+};
+
 // ---- Import / Export (per tab, per open account) ----
 export type ExportFormat = 'xlsx' | 'csv' | 'pdf';
 
@@ -122,6 +158,27 @@ export const importExportApi = {
     formData.append('file', file);
     return apiClient.post(`/accounts/${accountId}/tabs/${tabKey}/import`, formData);
   },
+};
+
+// ---- AID Dashboard (analytics feeds + automation attribute editing) ----
+export const dashboardApi = {
+  automationFacts: () => apiClient.get<AutomationFact[]>('/dashboard/automations').then((r) => r.data),
+  automationProfiles: () =>
+    apiClient.get<AutomationProfile[]>('/dashboard/automation-profiles').then((r) => r.data),
+  saveAutomationProfile: (
+    automationRefId: number,
+    attributes: {
+      categoryRefId: number | null;
+      goalRefId: number | null;
+      environmentRefId: number | null;
+      aiUsed: boolean | null;
+    },
+  ) => apiClient.put(`/dashboard/automation-profiles/${automationRefId}`, attributes),
+};
+
+// ---- AI assistant ----
+export const chatApi = {
+  ask: (messages: ChatMessage[]) => apiClient.post<ChatReply>('/chat', { messages }).then((r) => r.data),
 };
 
 // ---- Admin: users ----

@@ -19,6 +19,11 @@
     <ProjectReference Include="..\AidDashboard.Infrastructure\AidDashboard.Infrastructure.csproj" />
   </ItemGroup>
 
+  <!-- The AI assistant's schema description is loaded at runtime; copy it next to the app. -->
+  <ItemGroup>
+    <Content Include="AiAssistant\schema.md" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <!--
     On publish, build the React SPA and include its output under wwwroot in the published app,
     so a single `dotnet publish` produces one self-contained, Azure-ready deployable that serves

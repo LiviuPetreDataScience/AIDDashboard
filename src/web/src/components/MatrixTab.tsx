@@ -16,6 +16,8 @@ export interface MatrixCell {
 
 interface MatrixTabProps {
   title: string;
+  /** Selected account name, shown under the title. */
+  accountName?: string;
   /** Header for the first (row-label) column, e.g. "Location". */
   rowHeader: string;
   /** Reference items that form the fixed rows (e.g. Locations). */
@@ -24,13 +26,17 @@ interface MatrixTabProps {
   colItems: ReferenceItem[];
   cells: MatrixCell[];
   isAdmin: boolean;
-  exportFileName: string;
   /** Open account id and backend tab key, used by the import/export controls. */
   accountId: number;
   tabKey: string;
   /** Reloads the data after an import. */
   onImported: () => void;
   onSave: (cells: MatrixCell[]) => Promise<unknown>;
+  /**
+   * When true, rows with no values at all are hidden in read-only mode (but every row is shown
+   * while editing, so empty rows can still be filled in).
+   */
+  hideEmptyRowsWhenReadOnly?: boolean;
 }
 
 /** Internal grid row: a row-label plus one numeric field per column id. */
@@ -45,20 +51,22 @@ const ROW_LABEL_FIELD = '_label';
  */
 export function MatrixTab({
   title,
+  accountName,
   rowHeader,
   rowItems,
   colItems,
   cells,
   isAdmin,
-  exportFileName,
   accountId,
   tabKey,
   onImported,
   onSave,
+  hideEmptyRowsWhenReadOnly = false,
 }: MatrixTabProps) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<GridRow[]>([]);
   const [saving, setSaving] = useState(false);
+  const [search, setSearch] = useState('');
 
   // Build one grid row per row-reference, filling in the numeric cells.
   const computedRows = useMemo<GridRow[]>(() => {
@@ -83,13 +91,23 @@ export function MatrixTab({
       headerName: rowHeader,
       editable: false,
       pinned: 'left',
-      minWidth: 220,
+      width: 240,
+      tooltipField: ROW_LABEL_FIELD,
     };
     const valueColumns = colItems.map((colItem) => numberColumn(String(colItem.id), colItem.name));
     return [labelColumn, ...valueColumns];
   }, [colItems, rowHeader]);
 
-  const rows = editing ? draft : computedRows;
+  // While editing we always show every row (so empty ones can be filled in). In read-only mode,
+  // optionally hide rows that have no value in any column.
+  const readOnlyRows = useMemo(() => {
+    if (!hideEmptyRowsWhenReadOnly) {
+      return computedRows;
+    }
+    return computedRows.filter((row) => colItems.some((colItem) => typeof row[String(colItem.id)] === 'number'));
+  }, [computedRows, colItems, hideEmptyRowsWhenReadOnly]);
+
+  const rows = editing ? draft : readOnlyRows;
 
   function startEditing() {
     setDraft(structuredClone(computedRows));
@@ -110,18 +128,20 @@ export function MatrixTab({
     <>
       <PageHeader
         title={title}
-        actions={
-          <>
-            <ImportExportBar accountId={accountId} tabKey={tabKey} canImport={isAdmin} onImported={onImported} />
-            <EditModeBar
-              editing={editing}
-              canEdit={isAdmin}
-              saving={saving}
-              onEdit={startEditing}
-              onSave={saveChanges}
-              onCancel={() => setEditing(false)}
-            />
-          </>
+        accountName={accountName}
+        search={{ value: search, onChange: setSearch }}
+        importExport={
+          <ImportExportBar accountId={accountId} tabKey={tabKey} canImport={isAdmin} onImported={onImported} />
+        }
+        editControls={
+          <EditModeBar
+            editing={editing}
+            canEdit={isAdmin}
+            saving={saving}
+            onEdit={startEditing}
+            onSave={saveChanges}
+            onCancel={() => setEditing(false)}
+          />
         }
       />
       <EditableTable<GridRow>
@@ -129,7 +149,7 @@ export function MatrixTab({
         rows={rows}
         editing={editing}
         getRowKey={(row) => String(row._rowRefId)}
-        exportFileName={exportFileName}
+        quickFilter={search}
       />
     </>
   );

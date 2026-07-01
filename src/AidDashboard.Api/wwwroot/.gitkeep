@@ -1,0 +1,1 @@
+# Keeps the wwwroot directory in the repo. The production SPA is bundled here on publish.

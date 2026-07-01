@@ -11,33 +11,36 @@ interface EditModeBarProps {
 }
 
 /**
- * Reusable Edit / Save / Cancel control shown at the top of every tab. When not editing it
- * shows a single Edit button (for admins); while editing it shows Save and Cancel.
+ * Reusable Edit / Save / Cancel control. The layout height is the same whether showing "Edit"
+ * or "Save / Cancel" (the editing hint line is always reserved, just hidden when not editing),
+ * so toggling edit mode does not shift the surrounding header controls.
  */
 export function EditModeBar({ editing, canEdit, saving = false, onEdit, onSave, onCancel }: EditModeBarProps) {
   if (!canEdit) {
     return <span className="edit-bar-readonly">Read-only</span>;
   }
 
-  if (!editing) {
-    return (
-      <div className="edit-bar">
-        <button type="button" className="btn-secondary" onClick={onEdit}>
-          ✎ Edit
-        </button>
-      </div>
-    );
-  }
-
   return (
     <div className="edit-bar">
-      <button type="button" className="btn-primary" onClick={onSave} disabled={saving}>
-        {saving ? 'Saving…' : 'Save'}
-      </button>
-      <button type="button" className="btn-secondary" onClick={onCancel} disabled={saving}>
-        Cancel
-      </button>
-      <span className="edit-bar-hint">Editing — changes are not saved until you press Save.</span>
+      <div className="edit-bar-buttons">
+        {editing ? (
+          <>
+            <button type="button" className="btn-primary" onClick={onSave} disabled={saving}>
+              {saving ? 'Saving…' : 'Save'}
+            </button>
+            <button type="button" className="btn-secondary" onClick={onCancel} disabled={saving}>
+              Cancel
+            </button>
+          </>
+        ) : (
+          <button type="button" className="btn-secondary" onClick={onEdit}>
+            ✎ Edit
+          </button>
+        )}
+      </div>
+      <span className="edit-bar-hint" style={{ visibility: editing ? 'visible' : 'hidden' }}>
+        Editing — changes are not saved until you press Save.
+      </span>
     </div>
   );
 }

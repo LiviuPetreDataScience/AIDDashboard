@@ -1,0 +1,216 @@
+/* Layout and styling for the Automations analytics dashboard. */
+
+.dashboard {
+  padding: 0.5rem 1rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dashboard-message {
+  padding: 2rem;
+  color: var(--color-text-muted);
+}
+
+/* ---- Filter bar ---- */
+.dashboard-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.dashboard-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 180px;
+  flex: 1 1 180px;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.dashboard-filter select {
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 0.85rem;
+}
+
+.dashboard-reset {
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.dashboard-reset:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.dashboard-reset:not(:disabled):hover {
+  background: var(--color-surface-alt);
+}
+
+/* ---- Active filter chips ---- */
+.dashboard-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.dashboard-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.6rem;
+  border: none;
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.dashboard-chip span {
+  font-weight: 700;
+}
+
+/* ---- KPI cards ---- */
+.dashboard-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+}
+
+.kpi-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-top: 3px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  padding: 0.9rem 1rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.kpi-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  line-height: 1.2;
+}
+
+.kpi-label {
+  margin-top: 0.25rem;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+/* ---- Charts grid ---- */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 0.75rem;
+}
+
+.chart-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 0.9rem 0.9rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Wider cards (stacked bars and the table) span two columns when there is room. */
+.chart-card-wide {
+  grid-column: span 2;
+}
+
+@media (max-width: 900px) {
+  .chart-card-wide {
+    grid-column: span 1;
+  }
+}
+
+.chart-title {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  color: var(--color-accent);
+}
+
+/*
+ * Fixed height is required: Recharts' ResponsiveContainer measures its parent, so the parent
+ * must have a resolved height. (Using flex:1 here collapses it to 0 inside an auto-height card.)
+ */
+.chart-body {
+  height: 280px;
+}
+
+.chart-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--color-text-muted);
+}
+
+/* ---- Automation table ---- */
+.dashboard-table-scroll {
+  height: 280px;
+  overflow-y: auto;
+}
+
+.dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.dashboard-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  text-align: left;
+  padding: 0.45rem 0.6rem;
+  font-weight: 600;
+}
+
+.dashboard-table th.numeric,
+.dashboard-table td.numeric {
+  text-align: right;
+}
+
+.dashboard-table tbody tr {
+  cursor: pointer;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.dashboard-table tbody tr:hover {
+  background: var(--color-surface-alt);
+}
+
+.dashboard-table tbody tr.selected {
+  background: var(--color-editing-tint);
+}
+
+.dashboard-table td {
+  padding: 0.4rem 0.6rem;
+}
+
+.dashboard-table td.empty {
+  text-align: center;
+  color: var(--color-text-muted);
+  cursor: default;
+}

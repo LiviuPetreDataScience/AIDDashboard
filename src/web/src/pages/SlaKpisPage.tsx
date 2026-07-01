@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import type { ColDef } from 'ag-grid-community';
 import { slaKpiApi } from '../api/endpoints';
 import type { SlaKpiRow } from '../api/types';
 import { useSelectedAccount } from '../app/AccountContext';
 import { useReferenceData } from '../hooks/useReferenceData';
+import { useSelectedAccountName } from '../hooks/useSelectedAccountName';
 import { useTabEditor } from '../hooks/useTabEditor';
 import { EditableTable } from '../components/EditableTable';
 import { EditModeBar } from '../components/EditModeBar';
@@ -16,6 +18,8 @@ import { stableRowKey } from '../components/rowKey';
 export function SlaKpisPage() {
   const { selectedAccountId } = useSelectedAccount();
   const { getItems } = useReferenceData();
+  const accountName = useSelectedAccountName();
+  const [search, setSearch] = useState('');
 
   const editor = useTabEditor<SlaKpiRow>({
     queryKey: ['sla-kpis', selectedAccountId],
@@ -44,18 +48,20 @@ export function SlaKpisPage() {
     <>
       <PageHeader
         title="SLAs & KPIs"
-        actions={
-          <>
-            <ImportExportBar accountId={selectedAccountId} tabKey="sla-kpis" canImport={editor.isAdmin} onImported={editor.reload} />
-            <EditModeBar
-              editing={editor.editing}
-              canEdit={editor.isAdmin}
-              saving={editor.saving}
-              onEdit={editor.startEditing}
-              onSave={editor.saveChanges}
-              onCancel={editor.cancelEditing}
-            />
-          </>
+        accountName={accountName}
+        search={{ value: search, onChange: setSearch }}
+        importExport={
+          <ImportExportBar accountId={selectedAccountId} tabKey="sla-kpis" canImport={editor.isAdmin} onImported={editor.reload} />
+        }
+        editControls={
+          <EditModeBar
+            editing={editor.editing}
+            canEdit={editor.isAdmin}
+            saving={editor.saving}
+            onEdit={editor.startEditing}
+            onSave={editor.saveChanges}
+            onCancel={editor.cancelEditing}
+          />
         }
       />
       <EditableTable<SlaKpiRow>
@@ -63,10 +69,10 @@ export function SlaKpisPage() {
         rows={editor.rows}
         editing={editor.editing}
         getRowKey={stableRowKey}
+        quickFilter={search}
         onChange={editor.setDraft}
         enableAddDelete
         makeEmptyRow={() => ({ id: 0, canBeReported: false, financialPenalties: false, bonus: false } as SlaKpiRow)}
-        exportFileName="sla-kpis"
       />
     </>
   );

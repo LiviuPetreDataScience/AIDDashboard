@@ -26,5 +26,10 @@ public enum ReferenceType
     ContractType = 17,
     BillingModel = 18,
     TechnologySupported = 19,
-    Industry = 20
+    Industry = 20,
+    Competitor = 21,
+    Automation = 22,
+    AutomationCategory = 23,
+    AutomationGoal = 24,
+    Environment = 25
 }

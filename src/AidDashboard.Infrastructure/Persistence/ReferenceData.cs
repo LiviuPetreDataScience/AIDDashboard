@@ -99,6 +99,45 @@ public static class ReferenceData
             "Industrial robot industry", "Low technology industry", "Meat packing", "Mining", "Petroleum industry",
             "Pulp and paper industry", "Steel industry"
         },
+        [ReferenceType.Competitor] = new[]
+        {
+            "Locally provided", "Accenture", "ACP", "Atos", "Capgemini", "Cognizant", "Eviden", "HCL", "IATA",
+            "Deloitte", "DXC", "EY", "Fujitsu", "NTT", "IBM", "Infosys", "KPMG", "Pidas", "PwC", "Sitel", "SPIE",
+            "ST", "TCS", "Trustwave", "Wipro", "Cegeka", "Avanade", "Intelia", "Cubewise", "Callagenix", "CyberCX"
+        },
+        [ReferenceType.Automation] = new[]
+        {
+            "Sophie-ITSM tool", "Sophie-KB search", "Sophie-Survey", "Sophie-CSAT check", "Sophie-e-Contact IC",
+            "Sophie X- Account Management", "Sophie X - Ticket Management", "Sophie X - Proactive Management",
+            "Sophie X - Channels Platform", "Sophie X - Voice Experience", "Sophie X - Quality Tools",
+            "Sophie X - Privacy & Security", "EMAIL AUTOMATION", "Onboarding automation", "Phising Automation", "RPA",
+            "Queue Management", "Request fulfillment Automation", "Waybill Automation",
+            "Automated IMS (interaction) creation", "Incident Management End 2 End", "Athena One", "ServiceDesk Guru",
+            "Tailored AI Assistants", "Knowledge Max", "i-Forgot", "AMP Portal", "DEX / Nexthink", "SAI-Quality",
+            "ITAM - Stockroom Auditing", "ITAM - Swimlane Diagram Creation", "ITAM - Data Scrubbing",
+            "ITAM - Dashboard Creation", "Advanced Work Assignment (AWA) (ServiceNow)",
+            "Follow-up for user input (Servicenow)", "Approval reminders (Servicenow)",
+            "Accept/Reject solution reminders (Servicenow)", "Virtual Agent (Servicenow)",
+            "Virtual Agent - Teams integration (Servicenow)", "NowAssist for Resolution notes Summary (ServiceNow)",
+            "NowAssist for KB Article Generation (Servicenow)", "Automate license removal (ServiceNow)",
+            "Incident routing/auto-assignment (ServiceNow)", "On-Call schedule (ServiceNow)",
+            "User & Group provisioning via SailPoint (ServiceNow)", "SLA reminders (ServiceNow)",
+            "MIM notifications (ServiceNow)", "CSAT over the phone (Genesys Cloud CX)"
+        },
+        [ReferenceType.AutomationCategory] = new[]
+        {
+            "Process automation", "Sophie", "Assistants", "Genesys", "Self service", "Analytics"
+        },
+        [ReferenceType.AutomationGoal] = new[]
+        {
+            "Efficiency", "Cost Saving", "SLA Improvement", "Transformation"
+        },
+        [ReferenceType.Environment] = new[]
+        {
+            "Knowledge Portals", "ITSM tool", "Contact center tool", "Genesys", "Active Directory", "Data", "N/A",
+            "Knowledge Portals, ITSM Tool", "ITSM tool; Contact center tool", "ITSM, Contact center tool",
+            "Data, ITSM, Contact center tool"
+        },
         [ReferenceType.Country] = Countries
     };
 

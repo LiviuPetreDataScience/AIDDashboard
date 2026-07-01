@@ -4,7 +4,7 @@ namespace AidDashboard.Application.Tabs;
 public class AutomationDto
 {
     public int Id { get; set; }
-    public string? Name { get; set; }
+    public int? AutomationRefId { get; set; }
     public DateOnly? DeploymentDate { get; set; }
     public decimal? CostOfImplementationOneTime { get; set; }
     public decimal? RunningCostMonthly { get; set; }

@@ -31,7 +31,90 @@ export type ReferenceType =
   | 'ContractType'
   | 'BillingModel'
   | 'TechnologySupported'
-  | 'Industry';
+  | 'Industry'
+  | 'Competitor'
+  | 'Automation'
+  | 'AutomationCategory'
+  | 'AutomationGoal'
+  | 'Environment';
+
+export type ServiceNodeKind = 'Category' | 'Service';
+
+/** A node in the services hierarchy (admin drill-down editor). */
+export interface ServiceCatalogItem {
+  id: number;
+  parentId: number | null;
+  name: string;
+  kind: ServiceNodeKind;
+  sortOrder: number;
+  isActive: boolean;
+  hasChildren: boolean;
+}
+
+/** A leaf service with its bundled category path. */
+export interface ServiceLeaf {
+  id: number;
+  serviceName: string;
+  path: string;
+}
+
+export interface BreadcrumbItem {
+  id: number;
+  name: string;
+}
+
+/** One automation occurrence for an account, flattened for the Automations dashboard. */
+export interface AutomationFact {
+  accountId: number;
+  accountName: string;
+  regionalOwnership?: string | null;
+  automationRefId?: number | null;
+  automationName?: string | null;
+  category?: string | null;
+  goal?: string | null;
+  environment?: string | null;
+  aiUsed?: boolean | null;
+  deliveredBy?: string | null;
+  deploymentDate?: string | null;
+  costOfImplementation?: number | null;
+  runningCost?: number | null;
+  efficiencyImpact?: number | null;
+}
+
+/** One turn in the AI assistant conversation. */
+export interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+/** The assistant's answer. `configured` is false when Azure OpenAI settings are absent. */
+export interface ChatReply {
+  reply: string;
+  configured: boolean;
+}
+
+/** The editable shared attributes of one automation (admin "Automation Attributes" editor). */
+export interface AutomationProfile {
+  automationRefId: number;
+  automationName: string;
+  categoryRefId?: number | null;
+  goalRefId?: number | null;
+  environmentRefId?: number | null;
+  aiUsed?: boolean | null;
+}
+
+/** A row on the Services tab (a service plus the account's data for it). */
+export interface AccountServiceRow {
+  serviceItemId: number;
+  path: string;
+  serviceName: string;
+  contractEndDate?: string | null;
+  existsInCompany?: boolean | null;
+  providedByStefaniniGroup?: boolean | null;
+  providedByRefId?: number | null;
+  opportunityToProvide?: boolean | null;
+  details?: string | null;
+}
 
 export interface ReferenceItem {
   id: number;
@@ -60,6 +143,7 @@ export interface LoginResult {
 export interface AccountSummary {
   id: number;
   name: string;
+  lastUpdatedUtc?: string | null;
 }
 
 /** The Overall tab payload. Single-select fields are reference ids; multi-selects are id arrays. */
@@ -141,7 +225,7 @@ export interface SupportHourRow {
 
 export interface AutomationRow {
   id: number;
-  name?: string | null;
+  automationRefId?: number | null;
   deploymentDate?: string | null;
   costOfImplementationOneTime?: number | null;
   runningCostMonthly?: number | null;

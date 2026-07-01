@@ -12,6 +12,10 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Optional local overrides for secrets (e.g. AzureOpenAI key). This file is git-ignored
+// (appsettings.*.local.json) so credentials never get committed.
+builder.Configuration.AddJsonFile("appsettings.Development.local.json", optional: true, reloadOnChange: true);
+
 // ---------------------------------------------------------------------------
 // Service registration
 // ---------------------------------------------------------------------------
@@ -100,6 +104,9 @@ using (var scope = app.Services.CreateScope())
 
     var passwordHasher = services.GetRequiredService<IPasswordHasher>();
     await DataSeeder.SeedAsync(database, passwordHasher);
+
+    // (Re)create the read-only views the AI assistant queries.
+    await AiDatabaseViews.EnsureAsync(database);
 }
 
 // ---------------------------------------------------------------------------

@@ -29,12 +29,13 @@ public class AutomationsTableProvider : ITabTableProvider
     public async Task<TableData> ExportAsync(int accountId, CancellationToken cancellationToken = default)
     {
         var serviceTowers = new ReferenceLookup(await _referenceService.GetByTypeAsync(ReferenceType.ServiceTower, true, cancellationToken));
+        var automations = new ReferenceLookup(await _referenceService.GetByTypeAsync(ReferenceType.Automation, true, cancellationToken));
         var rows = await _automationService.GetAsync(accountId, cancellationToken);
 
         var tableRows = rows
             .Select(row => (IReadOnlyList<string?>)new[]
             {
-                row.Name,
+                automations.NameOf(row.AutomationRefId),
                 CellParsers.FormatDate(row.DeploymentDate),
                 CellParsers.FormatNumber(row.CostOfImplementationOneTime),
                 CellParsers.FormatNumber(row.RunningCostMonthly),
@@ -53,13 +54,14 @@ public class AutomationsTableProvider : ITabTableProvider
     public async Task ImportAsync(int accountId, TableData data, CancellationToken cancellationToken = default)
     {
         var serviceTowers = new ReferenceLookup(await _referenceService.GetByTypeAsync(ReferenceType.ServiceTower, true, cancellationToken));
+        var automations = new ReferenceLookup(await _referenceService.GetByTypeAsync(ReferenceType.Automation, true, cancellationToken));
 
         var rows = data.Rows
             .Where(row => !string.IsNullOrWhiteSpace(row.At(0)))
             .Select(row => new AutomationDto
             {
                 Id = 0,
-                Name = CellParsers.Text(row.At(0)),
+                AutomationRefId = automations.IdOf(row.At(0)),
                 DeploymentDate = CellParsers.Date(row.At(1)),
                 CostOfImplementationOneTime = CellParsers.Decimal(row.At(2)),
                 RunningCostMonthly = CellParsers.Decimal(row.At(3)),

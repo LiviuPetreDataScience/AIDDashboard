@@ -4,6 +4,7 @@ import type { StaffingModelType } from '../api/types';
 import { useSelectedAccount } from '../app/AccountContext';
 import { useAuth } from '../auth/AuthContext';
 import { useReferenceData } from '../hooks/useReferenceData';
+import { useSelectedAccountName } from '../hooks/useSelectedAccountName';
 import { MatrixTab, type MatrixCell } from '../components/MatrixTab';
 import { SelectAccountNotice } from '../components/SelectAccountNotice';
 
@@ -12,6 +13,7 @@ export function StaffingPage({ modelType, title }: { modelType: StaffingModelTyp
   const { selectedAccountId } = useSelectedAccount();
   const { isAdmin } = useAuth();
   const { getItems } = useReferenceData();
+  const accountName = useSelectedAccountName();
   const queryClient = useQueryClient();
 
   const queryKey = ['staffing', modelType, selectedAccountId];
@@ -48,12 +50,12 @@ export function StaffingPage({ modelType, title }: { modelType: StaffingModelTyp
   return (
     <MatrixTab
       title={title}
+      accountName={accountName}
       rowHeader="Location"
       rowItems={getItems('Location')}
       colItems={getItems('StaffingRole')}
       cells={matrixCells}
       isAdmin={isAdmin}
-      exportFileName={modelType === 'Initial' ? 'initial-staffing-model' : 'latest-approved-model'}
       accountId={selectedAccountId}
       tabKey={modelType === 'Initial' ? 'initial-staffing' : 'latest-approved'}
       onImported={() => queryClient.invalidateQueries({ queryKey })}

@@ -12,12 +12,12 @@ import {
   DateInput,
   Field,
   FormSection,
-  MultiCheckboxGroup,
   NumberInput,
   ReferenceSelect,
   TextInput,
   YesNoSelect,
 } from '../components/FormControls';
+import { MultiSelectDropdown } from '../components/MultiSelectDropdown';
 
 /** Overall tab: the per-account header form with grouped fields. */
 export function OverallPage() {
@@ -77,8 +77,8 @@ export function OverallPage() {
     <>
       <PageHeader
         title="Overall"
-        description={model.name}
-        actions={
+        accountName={model.name}
+        editControls={
           <EditModeBar
             editing={editing}
             canEdit={isAdmin}
@@ -143,19 +143,19 @@ export function OverallPage() {
           <YesNoSelect value={model.flagshipAccount} onChange={(v) => set('flagshipAccount', v)} disabled={disabled} />
         </Field>
         <Field label="Contract Type">
-          <MultiCheckboxGroup items={getItems('ContractType')} values={model.contractType} onChange={(v) => set('contractType', v)} disabled={disabled} />
+          <MultiSelectDropdown items={getItems('ContractType')} values={model.contractType} onChange={(v) => set('contractType', v)} disabled={disabled} />
         </Field>
         <Field label="Billing (Pricing model)">
-          <MultiCheckboxGroup items={getItems('BillingModel')} values={model.billingModel} onChange={(v) => set('billingModel', v)} disabled={disabled} />
+          <MultiSelectDropdown items={getItems('BillingModel')} values={model.billingModel} onChange={(v) => set('billingModel', v)} disabled={disabled} />
         </Field>
         <Field label="Billing (Pricing model) - LTS">
-          <MultiCheckboxGroup items={getItems('BillingModel')} values={model.billingModelLts} onChange={(v) => set('billingModelLts', v)} disabled={disabled} />
+          <MultiSelectDropdown items={getItems('BillingModel')} values={model.billingModelLts} onChange={(v) => set('billingModelLts', v)} disabled={disabled} />
         </Field>
         <Field label="Billing (Pricing model) - Infra">
-          <MultiCheckboxGroup items={getItems('BillingModel')} values={model.billingModelInfra} onChange={(v) => set('billingModelInfra', v)} disabled={disabled} />
+          <MultiSelectDropdown items={getItems('BillingModel')} values={model.billingModelInfra} onChange={(v) => set('billingModelInfra', v)} disabled={disabled} />
         </Field>
         <Field label="In Scope">
-          <MultiCheckboxGroup items={getItems('ServiceTower')} values={model.inScope} onChange={(v) => set('inScope', v)} disabled={disabled} />
+          <MultiSelectDropdown items={getItems('ServiceTower')} values={model.inScope} onChange={(v) => set('inScope', v)} disabled={disabled} />
         </Field>
       </FormSection>
 
@@ -197,10 +197,10 @@ export function OverallPage() {
           <ReferenceSelect items={getItems('ManagedBy')} value={model.managedByRefId} onChange={(v) => set('managedByRefId', v)} disabled={disabled} />
         </Field>
         <Field label="Technology supported">
-          <MultiCheckboxGroup items={getItems('TechnologySupported')} values={model.technologySupported} onChange={(v) => set('technologySupported', v)} disabled={disabled} />
+          <MultiSelectDropdown items={getItems('TechnologySupported')} values={model.technologySupported} onChange={(v) => set('technologySupported', v)} disabled={disabled} />
         </Field>
         <Field label="Devices supported">
-          <MultiCheckboxGroup items={getItems('Device')} values={model.devicesSupported} onChange={(v) => set('devicesSupported', v)} disabled={disabled} />
+          <MultiSelectDropdown items={getItems('Device')} values={model.devicesSupported} onChange={(v) => set('devicesSupported', v)} disabled={disabled} />
         </Field>
       </FormSection>
 

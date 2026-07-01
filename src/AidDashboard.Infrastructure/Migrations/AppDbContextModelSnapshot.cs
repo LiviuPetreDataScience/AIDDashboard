@@ -199,6 +199,9 @@ namespace AidDashboard.Infrastructure.Migrations
                     b.Property<int>("AccountId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("AutomationRefId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<decimal?>("CostOfImplementationOneTime")
                         .HasColumnType("TEXT");
 
@@ -226,9 +229,6 @@ namespace AidDashboard.Infrastructure.Migrations
                     b.Property<string>("ModifiedBy")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Name")
-                        .HasColumnType("TEXT");
-
                     b.Property<decimal?>("RunningCostMonthly")
                         .HasColumnType("TEXT");
 
@@ -237,6 +237,47 @@ namespace AidDashboard.Infrastructure.Migrations
                     b.HasIndex("AccountId");
 
                     b.ToTable("Automations");
+                });
+
+            modelBuilder.Entity("AidDashboard.Domain.Accounts.AutomationProfile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool?>("AiUsed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("AutomationRefId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("CategoryRefId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("EnvironmentRefId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("GoalRefId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AutomationRefId")
+                        .IsUnique();
+
+                    b.ToTable("AutomationProfiles");
                 });
 
             modelBuilder.Entity("AidDashboard.Domain.Accounts.ContractualLanguageCell", b =>
@@ -611,6 +652,98 @@ namespace AidDashboard.Infrastructure.Migrations
                     b.ToTable("ReferenceItems");
                 });
 
+            modelBuilder.Entity("AidDashboard.Domain.Services.AccountServiceEntry", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("AccountId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateOnly?>("ContractEndDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Details")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool?>("ExistsInCompany")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool?>("OpportunityToProvide")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("ProvidedByRefId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool?>("ProvidedByStefaniniGroup")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ServiceItemId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId", "ServiceItemId")
+                        .IsUnique();
+
+                    b.ToTable("AccountServiceEntries");
+                });
+
+            modelBuilder.Entity("AidDashboard.Domain.Services.ServiceCatalogItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("ParentId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParentId");
+
+                    b.ToTable("ServiceCatalogItems");
+                });
+
             modelBuilder.Entity("AidDashboard.Domain.Accounts.AccountCountry", b =>
                 {
                     b.HasOne("AidDashboard.Domain.Accounts.Account", null)
@@ -692,6 +825,23 @@ namespace AidDashboard.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("AidDashboard.Domain.Services.AccountServiceEntry", b =>
+                {
+                    b.HasOne("AidDashboard.Domain.Accounts.Account", null)
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("AidDashboard.Domain.Services.ServiceCatalogItem", b =>
+                {
+                    b.HasOne("AidDashboard.Domain.Services.ServiceCatalogItem", null)
+                        .WithMany("Children")
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("AidDashboard.Domain.Accounts.Account", b =>
                 {
                     b.Navigation("Automations");
@@ -714,6 +864,11 @@ namespace AidDashboard.Infrastructure.Migrations
             modelBuilder.Entity("AidDashboard.Domain.Accounts.AccountCountry", b =>
                 {
                     b.Navigation("DeviceCells");
+                });
+
+            modelBuilder.Entity("AidDashboard.Domain.Services.ServiceCatalogItem", b =>
+                {
+                    b.Navigation("Children");
                 });
 #pragma warning restore 612, 618
         }

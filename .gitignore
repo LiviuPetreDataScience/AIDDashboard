@@ -13,8 +13,8 @@ publish/
 node_modules/
 src/web/dist/
 
-# Generated SPA assets in the API (produced on publish)
-src/AidDashboard.Api/wwwroot/
+# Note: src/AidDashboard.Api/wwwroot is kept (empty, with .gitkeep) so the host starts in
+# development; the production SPA is bundled into the publish output, not the source tree.
 
 # IDE
 .vs/

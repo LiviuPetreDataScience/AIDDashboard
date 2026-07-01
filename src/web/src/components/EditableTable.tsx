@@ -1,12 +1,10 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import {
   AllCommunityModule,
   ModuleRegistry,
   type CellValueChangedEvent,
   type ColDef,
-  type GridApi,
-  type GridReadyEvent,
 } from 'ag-grid-community';
 import { aidGridTheme } from '../theme/agGridTheme';
 import './EditableTable.css';
@@ -27,34 +25,33 @@ export interface EditableTableProps<TRow> {
   editing: boolean;
   /** Stable unique key for a row (used by AG Grid to track rows). */
   getRowKey: (row: TRow) => string;
+  /** Global "contains" search text applied across all columns. */
+  quickFilter?: string;
   /** Called when rows are structurally changed (a row added or deleted). */
   onChange?: (rows: TRow[]) => void;
   /** Enables the X-to-delete column and the trailing blank "add" row (list-style tables). */
   enableAddDelete?: boolean;
   /** Produces a blank row for the trailing add row. Required when enableAddDelete is set. */
   makeEmptyRow?: () => TRow;
-  /** File name (without extension) used for the CSV export. */
-  exportFileName?: string;
 }
 
 /**
- * Reusable data grid used by every table tab. Provides sorting, per-column filtering,
- * a global search box and CSV export. In edit mode cells become editable; for list-style
- * tables an X appears on each row to delete it and a blank row at the bottom adds a new one.
+ * Reusable data grid used by every table tab. Provides sorting, per-column "contains" filters
+ * (a plain text box under each header) and a global quick-search. In edit mode cells become
+ * editable; for list-style tables an X appears on each row to delete it and a blank row at the
+ * bottom adds a new one. Columns fill the grid width (give a column `flex` to absorb spare space),
+ * and the grid scrolls horizontally when the columns are wider than the page.
  */
 export function EditableTable<TRow extends object>({
   columns,
   rows,
   editing,
   getRowKey,
+  quickFilter,
   onChange,
   enableAddDelete = false,
   makeEmptyRow,
-  exportFileName = 'export',
 }: EditableTableProps<TRow>) {
-  const gridApiRef = useRef<GridApi<TRow> | null>(null);
-  const [quickFilter, setQuickFilter] = useState('');
-
   // Append a blank row at the end while editing a list-style table.
   const displayRows = useMemo(() => {
     if (editing && enableAddDelete && makeEmptyRow) {
@@ -67,29 +64,37 @@ export function EditableTable<TRow extends object>({
   const columnDefs = useMemo<ColDef<TRow>[]>(() => {
     const defs: ColDef<TRow>[] = [];
 
-    // Delete column (only meaningful while editing a list-style table).
+    // Delete / add-affordance column (only meaningful while editing a list-style table).
     if (enableAddDelete && editing) {
       defs.push({
         headerName: '',
         colId: 'delete',
-        width: 48,
+        width: 40,
+        minWidth: 40,
+        maxWidth: 40,
         pinned: 'left',
         sortable: false,
         filter: false,
         editable: false,
+        resizable: false,
+        cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 },
         cellRenderer: (params: { data: TRow }) => {
           if ((params.data as Record<string, unknown>)[NEW_ROW_FLAG]) {
-            return '';
+            return <span className="grid-add-indicator" title="Type in this row to add a new entry">＋</span>;
           }
-          const button = document.createElement('button');
-          button.textContent = '✕';
-          button.title = 'Delete row';
-          button.className = 'grid-delete-button';
-          button.onclick = () => {
-            const remaining = rows.filter((row) => getRowKey(row) !== getRowKey(params.data));
-            onChange?.(remaining);
-          };
-          return button;
+          return (
+            <button
+              type="button"
+              className="grid-delete-button"
+              title="Delete row"
+              onClick={() => {
+                const remaining = rows.filter((row) => getRowKey(row) !== getRowKey(params.data));
+                onChange?.(remaining);
+              }}
+            >
+              ✕
+            </button>
+          );
         },
       });
     }
@@ -101,19 +106,18 @@ export function EditableTable<TRow extends object>({
   const defaultColDef = useMemo<ColDef<TRow>>(
     () => ({
       sortable: true,
-      filter: true,
-      floatingFilter: true,
       resizable: true,
       editable: editing,
-      flex: 1,
-      minWidth: 120,
+      // A plain text "contains" filter box under every header — no funnel button, no popup,
+      // and it works on numeric columns too (matches the displayed text).
+      filter: 'agTextColumnFilter',
+      floatingFilter: true,
+      suppressHeaderMenuButton: true,
+      filterParams: { filterOptions: ['contains'], maxNumConditions: 1, buttons: [] },
+      floatingFilterComponentParams: { suppressFilterButton: true },
     }),
     [editing],
   );
-
-  function handleGridReady(event: GridReadyEvent<TRow>) {
-    gridApiRef.current = event.api;
-  }
 
   function handleCellValueChanged(event: CellValueChangedEvent<TRow>) {
     const data = event.data as Record<string, unknown>;
@@ -126,25 +130,8 @@ export function EditableTable<TRow extends object>({
     // Edits to existing rows mutate the draft objects in place; the parent reads them on save.
   }
 
-  function handleExportCsv() {
-    gridApiRef.current?.exportDataAsCsv({ fileName: `${exportFileName}.csv` });
-  }
-
   return (
-    <div className="editable-table">
-      <div className="editable-table-toolbar">
-        <input
-          type="search"
-          className="grid-search"
-          placeholder="Search this table…"
-          value={quickFilter}
-          onChange={(event) => setQuickFilter(event.target.value)}
-        />
-        <button type="button" className="btn-secondary" onClick={handleExportCsv}>
-          Export CSV
-        </button>
-      </div>
-
+    <div className={editing ? 'editable-table editing' : 'editable-table'}>
       <div className="editable-table-grid">
         <AgGridReact<TRow>
           theme={aidGridTheme}
@@ -157,7 +144,6 @@ export function EditableTable<TRow extends object>({
               ? '__new_row__'
               : getRowKey(params.data)
           }
-          onGridReady={handleGridReady}
           onCellValueChanged={handleCellValueChanged}
           stopEditingWhenCellsLoseFocus
           animateRows

@@ -4,6 +4,7 @@ using AidDashboard.Domain.Accounts;
 using AidDashboard.Domain.Common;
 using AidDashboard.Domain.Identity;
 using AidDashboard.Domain.Reference;
+using AidDashboard.Domain.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
@@ -31,6 +32,9 @@ public class AppDbContext : DbContext
     public DbSet<Opportunity> Opportunities => Set<Opportunity>();
     public DbSet<SlaKpi> SlaKpis => Set<SlaKpi>();
     public DbSet<SupportHour> SupportHours => Set<SupportHour>();
+    public DbSet<ServiceCatalogItem> ServiceCatalogItems => Set<ServiceCatalogItem>();
+    public DbSet<AccountServiceEntry> AccountServiceEntries => Set<AccountServiceEntry>();
+    public DbSet<AutomationProfile> AutomationProfiles => Set<AutomationProfile>();
     public DbSet<ChangeLog> ChangeLogs => Set<ChangeLog>();
 
     protected override void OnModelCreating(ModelBuilder b)
@@ -89,6 +93,23 @@ public class AppDbContext : DbContext
 
         b.Entity<SupportHour>(e =>
             e.HasIndex(x => new { x.AccountId, x.LanguageRefId }).IsUnique());
+
+        b.Entity<ServiceCatalogItem>(e =>
+        {
+            e.Property(x => x.Name).HasMaxLength(300).IsRequired();
+            e.HasIndex(x => x.ParentId);
+            // Deleting a category removes its whole subtree.
+            e.HasMany(x => x.Children).WithOne().HasForeignKey(x => x.ParentId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        b.Entity<AccountServiceEntry>(e =>
+        {
+            e.HasIndex(x => new { x.AccountId, x.ServiceItemId }).IsUnique();
+            e.HasOne<Account>().WithMany().HasForeignKey(x => x.AccountId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        b.Entity<AutomationProfile>(e =>
+            e.HasIndex(x => x.AutomationRefId).IsUnique());
 
         b.Entity<Automation>().Property(x => x.CostOfImplementationOneTime).HasColumnType("TEXT");
         b.Entity<Automation>().Property(x => x.RunningCostMonthly).HasColumnType("TEXT");

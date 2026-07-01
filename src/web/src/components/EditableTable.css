@@ -1,22 +1,71 @@
 .editable-table {
   display: flex;
   flex-direction: column;
-  height: 100%;
 }
 
-.editable-table-toolbar {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.editable-table-toolbar .grid-search {
-  max-width: 320px;
-}
-
+/*
+ * Explicit height so the grid always renders (a percentage/flex height chain can collapse
+ * to zero and hide the grid entirely). The grid scrolls internally within this height.
+ */
 .editable-table-grid {
-  flex: 1;
-  min-height: 420px;
+  height: calc(100vh - 240px);
+  min-height: 380px;
+}
+
+/* ---- Edit-mode visual cue ---- */
+/*
+ * Edit mode is made obvious by two changes versus read-only:
+ *  1) the header bar switches from blue to navy, and
+ *  2) the editable data cells get a light-blue tint (with an accent ring on hover/focus).
+ * The pinned Location/action columns and read-only mode stay plain white.
+ */
+.editable-table.editing .editable-table-grid {
+  border-radius: var(--radius-sm);
+  box-shadow: 0 6px 20px rgba(17, 29, 65, 0.12);
+}
+
+/* Tint the whole grid body via AG Grid's own theme variables (honoured by the theme). */
+.editable-table.editing .ag-root-wrapper {
+  --ag-background-color: var(--color-editing-tint);
+  --ag-odd-row-background-color: var(--color-editing-tint);
+}
+
+/* Navy header in edit mode. */
+.editable-table.editing .ag-header,
+.editable-table.editing .ag-header-cell,
+.editable-table.editing .ag-header-group-cell {
+  background-color: var(--color-accent) !important;
+}
+
+/*
+ * Per-column filter row: hide the funnel/menu button (we only ever do a plain "contains"
+ * match) and let the text box fill the full column width.
+ */
+.editable-table-grid .ag-floating-filter-button {
+  display: none !important;
+}
+.editable-table-grid .ag-floating-filter-body {
+  width: 100% !important;
+  margin-right: 0 !important;
+}
+
+/* Highlight the focused cell like an active input. */
+.editable-table.editing .ag-cell.ag-cell-focus {
+  box-shadow: inset 0 0 0 2px var(--color-primary) !important;
+  background-color: #ffffff !important;
+}
+
+/* Tighter line spacing for wrapped cell and header text (default is far too loose). */
+.editable-table-grid .ag-cell-wrap-text {
+  line-height: 1.35;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+.editable-table-grid .ag-header-cell-text {
+  line-height: 1.3;
+  /* Wrap headers only at spaces — never split a single word like "Portughese". */
+  overflow-wrap: normal;
+  word-break: normal;
 }
 
 .grid-delete-button {
@@ -24,10 +73,20 @@
   background: transparent;
   color: var(--color-danger);
   font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1;
   cursor: pointer;
-  padding: 0 0.25rem;
+  padding: 0;
 }
 .grid-delete-button:hover {
   background: transparent;
   color: var(--color-accent-hover);
+}
+
+/* The "+" affordance on the trailing blank (add) row. */
+.grid-add-indicator {
+  color: var(--color-success);
+  font-weight: 700;
+  font-size: 1.05rem;
+  line-height: 1;
 }

@@ -69,7 +69,7 @@ public class AutomationService : IAutomationService
 
     private static void ApplyFields(Automation entity, AutomationDto dto)
     {
-        entity.Name = dto.Name;
+        entity.AutomationRefId = dto.AutomationRefId;
         entity.DeploymentDate = dto.DeploymentDate;
         entity.CostOfImplementationOneTime = dto.CostOfImplementationOneTime;
         entity.RunningCostMonthly = dto.RunningCostMonthly;
@@ -81,7 +81,7 @@ public class AutomationService : IAutomationService
     private static AutomationDto MapToDto(Automation entity) => new()
     {
         Id = entity.Id,
-        Name = entity.Name,
+        AutomationRefId = entity.AutomationRefId,
         DeploymentDate = entity.DeploymentDate,
         CostOfImplementationOneTime = entity.CostOfImplementationOneTime,
         RunningCostMonthly = entity.RunningCostMonthly,

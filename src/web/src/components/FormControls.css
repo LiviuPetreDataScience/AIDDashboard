@@ -31,23 +31,3 @@
   color: var(--color-text);
 }
 
-.checkbox-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem;
-  max-height: 180px;
-  overflow: auto;
-}
-
-.checkbox-option {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-weight: 400;
-}
-.checkbox-option input {
-  width: auto;
-}

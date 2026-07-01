@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import type { ColDef } from 'ag-grid-community';
 import { automationApi } from '../api/endpoints';
 import type { AutomationRow } from '../api/types';
 import { useSelectedAccount } from '../app/AccountContext';
 import { useReferenceData } from '../hooks/useReferenceData';
+import { useSelectedAccountName } from '../hooks/useSelectedAccountName';
 import { useTabEditor } from '../hooks/useTabEditor';
 import { EditableTable } from '../components/EditableTable';
 import { EditModeBar } from '../components/EditModeBar';
@@ -16,6 +18,8 @@ import { stableRowKey } from '../components/rowKey';
 export function AutomationsPage() {
   const { selectedAccountId } = useSelectedAccount();
   const { getItems } = useReferenceData();
+  const accountName = useSelectedAccountName();
+  const [search, setSearch] = useState('');
 
   const editor = useTabEditor<AutomationRow>({
     queryKey: ['automations', selectedAccountId],
@@ -31,31 +35,34 @@ export function AutomationsPage() {
   const serviceTowers = getItems('ServiceTower');
 
   const columns: ColDef<AutomationRow>[] = [
-    textColumn('name', 'Automation Name'),
+    referenceColumn('automationRefId', 'Automation Name', getItems('Automation'), { flex: 2, minWidth: 200 }),
     dateColumn('deploymentDate', 'Deployment Date'),
     numberColumn('costOfImplementationOneTime', 'Cost of implementation (one time - $)'),
     numberColumn('runningCostMonthly', 'Running cost (monthly - $)'),
     numberColumn('efficiencyImpactFtePerMonth', 'Efficiency impact (FTE/month)'),
-    referenceColumn('deliveredByRefId', 'Delivered By', serviceTowers),
-    textColumn('details', 'Details'),
+    referenceColumn('deliveredByRefId', 'Delivered By', serviceTowers, { flex: 0, width: 120, minWidth: 110 }),
+    // Details fills the remaining width but can shrink so the table avoids a horizontal scroll.
+    textColumn('details', 'Details', { flex: 1, minWidth: 160 }),
   ];
 
   return (
     <>
       <PageHeader
         title="Automations"
-        actions={
-          <>
-            <ImportExportBar accountId={selectedAccountId} tabKey="automations" canImport={editor.isAdmin} onImported={editor.reload} />
-            <EditModeBar
-              editing={editor.editing}
-              canEdit={editor.isAdmin}
-              saving={editor.saving}
-              onEdit={editor.startEditing}
-              onSave={editor.saveChanges}
-              onCancel={editor.cancelEditing}
-            />
-          </>
+        accountName={accountName}
+        search={{ value: search, onChange: setSearch }}
+        importExport={
+          <ImportExportBar accountId={selectedAccountId} tabKey="automations" canImport={editor.isAdmin} onImported={editor.reload} />
+        }
+        editControls={
+          <EditModeBar
+            editing={editor.editing}
+            canEdit={editor.isAdmin}
+            saving={editor.saving}
+            onEdit={editor.startEditing}
+            onSave={editor.saveChanges}
+            onCancel={editor.cancelEditing}
+          />
         }
       />
       <EditableTable<AutomationRow>
@@ -63,10 +70,10 @@ export function AutomationsPage() {
         rows={editor.rows}
         editing={editor.editing}
         getRowKey={stableRowKey}
+        quickFilter={search}
         onChange={editor.setDraft}
         enableAddDelete
         makeEmptyRow={() => ({ id: 0 } as AutomationRow)}
-        exportFileName="automations"
       />
     </>
   );

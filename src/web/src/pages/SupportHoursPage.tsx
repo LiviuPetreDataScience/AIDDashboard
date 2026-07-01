@@ -6,12 +6,13 @@ import type { SupportCoverage, SupportHourRow } from '../api/types';
 import { useSelectedAccount } from '../app/AccountContext';
 import { useAuth } from '../auth/AuthContext';
 import { useReferenceData } from '../hooks/useReferenceData';
+import { useSelectedAccountName } from '../hooks/useSelectedAccountName';
 import { EditableTable } from '../components/EditableTable';
 import { EditModeBar } from '../components/EditModeBar';
 import { ImportExportBar } from '../components/ImportExportBar';
 import { PageHeader } from '../components/PageHeader';
 import { SelectAccountNotice } from '../components/SelectAccountNotice';
-import { textColumn, yesNoColumn } from '../components/gridColumns';
+import { yesNoColumn } from '../components/gridColumns';
 
 /** Friendly labels for the three mutually-exclusive coverage options. */
 const COVERAGE_LABELS: Record<SupportCoverage, string> = {
@@ -37,6 +38,7 @@ export function SupportHoursPage() {
   const { selectedAccountId } = useSelectedAccount();
   const { isAdmin } = useAuth();
   const { getItems } = useReferenceData();
+  const accountName = useSelectedAccountName();
   const queryClient = useQueryClient();
 
   const queryKey = ['support-hours', selectedAccountId];
@@ -50,6 +52,7 @@ export function SupportHoursPage() {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<GridRow[]>([]);
   const [saving, setSaving] = useState(false);
+  const [search, setSearch] = useState('');
 
   const languages = getItems('SupportHoursLanguage');
 
@@ -77,19 +80,25 @@ export function SupportHoursPage() {
     return <SelectAccountNotice />;
   }
 
+  // Flex widths so the table fills the page like the others (Language gets the largest share).
   const columns: ColDef<GridRow>[] = [
-    { field: '_label', headerName: 'Language', editable: false, pinned: 'left', minWidth: 200 },
-    textColumn('fromMondayFriday', 'From (M-F)'),
-    textColumn('toMondayFriday', 'To (M-F)'),
+    { field: '_label', headerName: 'Language', editable: false, flex: 3, minWidth: 200 },
+    { field: 'fromMondayFriday', headerName: 'From (M-F)', flex: 1, minWidth: 110 },
+    { field: 'toMondayFriday', headerName: 'To (M-F)', flex: 1, minWidth: 110 },
     {
       field: 'coverage',
       headerName: 'Coverage (8x5 / 24x5 / 24x7)',
+      headerTooltip: 'Coverage (8x5 / 24x5 / 24x7)',
+      wrapHeaderText: true,
+      autoHeaderHeight: true,
+      flex: 2,
+      minWidth: 160,
       cellEditor: 'agSelectCellEditor',
       cellEditorParams: { values: ['None', 'EightByFive', 'TwentyFourFive', 'TwentyFourSeven'] },
       valueFormatter: (params) => COVERAGE_LABELS[params.value as SupportCoverage] ?? '',
     },
-    yesNoColumn('onCallInterpretDhs', 'On call / Interpret (DHS)'),
-    yesNoColumn('sophie', 'Sophie'),
+    yesNoColumn('onCallInterpretDhs', 'On call / Interpret (DHS)', { flex: 2, minWidth: 150 }),
+    yesNoColumn('sophie', 'Sophie', { flex: 1, minWidth: 110 }),
   ];
 
   const rows = editing ? draft : computedRows;
@@ -133,23 +142,25 @@ export function SupportHoursPage() {
     <>
       <PageHeader
         title="Support Hours"
-        actions={
-          <>
-            <ImportExportBar
-              accountId={selectedAccountId}
-              tabKey="support-hours"
-              canImport={isAdmin}
-              onImported={() => queryClient.invalidateQueries({ queryKey })}
-            />
-            <EditModeBar
-              editing={editing}
-              canEdit={isAdmin}
-              saving={saving}
-              onEdit={startEditing}
-              onSave={saveChanges}
-              onCancel={() => setEditing(false)}
-            />
-          </>
+        accountName={accountName}
+        search={{ value: search, onChange: setSearch }}
+        importExport={
+          <ImportExportBar
+            accountId={selectedAccountId}
+            tabKey="support-hours"
+            canImport={isAdmin}
+            onImported={() => queryClient.invalidateQueries({ queryKey })}
+          />
+        }
+        editControls={
+          <EditModeBar
+            editing={editing}
+            canEdit={isAdmin}
+            saving={saving}
+            onEdit={startEditing}
+            onSave={saveChanges}
+            onCancel={() => setEditing(false)}
+          />
         }
       />
       <EditableTable<GridRow>
@@ -157,7 +168,7 @@ export function SupportHoursPage() {
         rows={rows}
         editing={editing}
         getRowKey={(row) => String(row.languageRefId)}
-        exportFileName="support-hours"
+        quickFilter={search}
       />
     </>
   );

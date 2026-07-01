@@ -1,0 +1,85 @@
+/* Styling for the external-source connection dialog. */
+.connect-intro {
+  margin: 0 0 1rem;
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.connect-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem 0.9rem;
+}
+.connect-fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+.connect-fields label.connect-wide {
+  grid-column: span 2;
+}
+.connect-fields input,
+.connect-fields select {
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+}
+
+.connect-test {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+.connect-ok {
+  color: var(--color-success);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.connect-map-title {
+  margin: 0.5rem 0 0.4rem;
+  font-size: 0.9rem;
+  color: var(--color-accent);
+}
+.connect-map {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+.connect-map th,
+.connect-map td {
+  text-align: left;
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+.connect-map th {
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+.connect-map td:first-child {
+  width: 45%;
+  font-weight: 500;
+}
+.connect-map input {
+  width: 100%;
+  padding: 0.3rem 0.45rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.83rem;
+}
+
+.connect-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 1.25rem;
+}
+.connect-actions .connect-ok {
+  margin-right: auto;
+}

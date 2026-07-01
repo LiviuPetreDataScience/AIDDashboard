@@ -1,8 +1,11 @@
 using AidDashboard.Application.Abstractions;
 using AidDashboard.Application.Accounts;
 using AidDashboard.Application.Admin;
+using AidDashboard.Application.Chat;
+using AidDashboard.Application.Dashboard;
 using AidDashboard.Application.ImportExport;
 using AidDashboard.Application.Reference;
+using AidDashboard.Application.Services;
 using AidDashboard.Application.Tabs;
 using AidDashboard.Domain.Accounts;
 using AidDashboard.Infrastructure.Auth;
@@ -44,6 +47,15 @@ public static class DependencyInjection
         services.AddScoped<IOpportunityService, OpportunityService>();
         services.AddScoped<ISlaKpiService, SlaKpiService>();
 
+        // Services hierarchy + per-account services data.
+        services.AddScoped<IServiceCatalogService, ServiceCatalogService>();
+        services.AddScoped<IAccountServicesService, AccountServicesService>();
+        services.AddScoped<IDashboardService, DashboardService>();
+
+        // AI assistant (Azure OpenAI chat). Needs an HttpClient; settings are read at call time.
+        services.AddHttpClient();
+        services.AddScoped<IChatService, ChatService>();
+
         // Import/export: the serializer renders/parses files; each provider maps one tab.
         services.AddSingleton<ITableSerializer, TableSerializer>();
         services.AddScoped<ITabTableProvider, AutomationsTableProvider>();
@@ -60,6 +72,7 @@ public static class DependencyInjection
             serviceProvider.GetRequiredService<IStaffingService>(),
             serviceProvider.GetRequiredService<IReferenceService>(),
             StaffingModelType.LatestApproved));
+        services.AddScoped<ITabTableProvider, ServicesTableProvider>();
 
         return services;
     }

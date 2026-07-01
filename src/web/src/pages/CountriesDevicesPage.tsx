@@ -6,6 +6,7 @@ import type { CountryRow } from '../api/types';
 import { useSelectedAccount } from '../app/AccountContext';
 import { useAuth } from '../auth/AuthContext';
 import { useReferenceData } from '../hooks/useReferenceData';
+import { useSelectedAccountName } from '../hooks/useSelectedAccountName';
 import { EditableTable } from '../components/EditableTable';
 import { EditModeBar } from '../components/EditModeBar';
 import { ImportExportBar } from '../components/ImportExportBar';
@@ -26,6 +27,7 @@ export function CountriesDevicesPage() {
   const { selectedAccountId } = useSelectedAccount();
   const { isAdmin } = useAuth();
   const { getItems } = useReferenceData();
+  const accountName = useSelectedAccountName();
   const queryClient = useQueryClient();
 
   const queryKey = ['countries-devices', selectedAccountId];
@@ -39,6 +41,7 @@ export function CountriesDevicesPage() {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<GridRow[]>([]);
   const [saving, setSaving] = useState(false);
+  const [search, setSearch] = useState('');
 
   const devices = getItems('Device');
   const countries = getItems('Country');
@@ -102,24 +105,26 @@ export function CountriesDevicesPage() {
   return (
     <>
       <PageHeader
-        title="Countries / Users / Devices Supported"
-        actions={
-          <>
-            <ImportExportBar
-              accountId={selectedAccountId}
-              tabKey="countries-devices"
-              canImport={isAdmin}
-              onImported={() => queryClient.invalidateQueries({ queryKey })}
-            />
-            <EditModeBar
-              editing={editing}
-              canEdit={isAdmin}
-              saving={saving}
-              onEdit={startEditing}
-              onSave={saveChanges}
-              onCancel={() => setEditing(false)}
-            />
-          </>
+        title="Countries / Users / Devices"
+        accountName={accountName}
+        search={{ value: search, onChange: setSearch }}
+        importExport={
+          <ImportExportBar
+            accountId={selectedAccountId}
+            tabKey="countries-devices"
+            canImport={isAdmin}
+            onImported={() => queryClient.invalidateQueries({ queryKey })}
+          />
+        }
+        editControls={
+          <EditModeBar
+            editing={editing}
+            canEdit={isAdmin}
+            saving={saving}
+            onEdit={startEditing}
+            onSave={saveChanges}
+            onCancel={() => setEditing(false)}
+          />
         }
       />
       <EditableTable<GridRow>
@@ -127,10 +132,10 @@ export function CountriesDevicesPage() {
         rows={rows}
         editing={editing}
         getRowKey={stableRowKey}
+        quickFilter={search}
         onChange={setDraft}
         enableAddDelete
         makeEmptyRow={() => ({ countryRefId: null, noOfUsers: null, noOfLtsStaff: null })}
-        exportFileName="countries-users-devices"
       />
     </>
   );

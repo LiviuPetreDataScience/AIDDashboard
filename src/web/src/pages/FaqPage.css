@@ -1,0 +1,29 @@
+.faq-content {
+  max-width: 920px;
+  color: var(--color-text);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* Screenshots: keep them within the column. */
+.faq-content img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Section headings are in-page anchor targets; leave a little room above when scrolled to. */
+.faq-content h2 {
+  scroll-margin-top: 1rem;
+}
+
+/* Wide content scrolls inside its own box rather than the page. */
+.faq-content table {
+  max-width: 100%;
+}
+.faq-content pre {
+  overflow-x: auto;
+}
+
+.faq-content a {
+  color: var(--color-accent);
+}

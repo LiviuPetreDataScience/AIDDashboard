@@ -1,7 +1,7 @@
 namespace AidDashboard.Application.Accounts;
 
-/// <summary>Lightweight account record used by the account picker and lists.</summary>
-public record AccountSummaryDto(int Id, string Name);
+/// <summary>Lightweight account record used by the account picker and the home accounts list.</summary>
+public record AccountSummaryDto(int Id, string Name, DateTime? LastUpdatedUtc);
 
 /// <summary>Payload to create a new account.</summary>
 public record CreateAccountRequest(string Name);

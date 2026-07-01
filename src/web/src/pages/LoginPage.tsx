@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
+import './LoginPage.css';
 
 /** Username/password login screen. */
 export function LoginPage() {
@@ -27,14 +28,14 @@ export function LoginPage() {
   }
 
   return (
-    <div style={styles.page}>
-      <form style={styles.card} onSubmit={handleSubmit}>
-        <h1 style={styles.title}>
-          AID <span style={{ color: 'var(--color-accent)' }}>Dashboard</span>
+    <div className="login-page">
+      <form className="login-card" onSubmit={handleSubmit}>
+        <h1 className="login-title">
+          AID <span>Dashboard</span>
         </h1>
-        <p style={styles.subtitle}>Sign in to continue</p>
+        <p className="login-subtitle">Sign in to continue</p>
 
-        <label style={styles.label} htmlFor="username">Username</label>
+        <label className="login-label" htmlFor="username">Username</label>
         <input
           id="username"
           autoFocus
@@ -43,7 +44,7 @@ export function LoginPage() {
           autoComplete="username"
         />
 
-        <label style={styles.label} htmlFor="password">Password</label>
+        <label className="login-label" htmlFor="password">Password</label>
         <input
           id="password"
           type="password"
@@ -52,38 +53,12 @@ export function LoginPage() {
           autoComplete="current-password"
         />
 
-        {errorMessage && <div style={styles.error}>{errorMessage}</div>}
+        {errorMessage && <div className="login-error">{errorMessage}</div>}
 
-        <button type="submit" className="btn-primary" style={styles.submit} disabled={isSubmitting}>
+        <button type="submit" className="btn-primary login-submit" disabled={isSubmitting}>
           {isSubmitting ? 'Signing in…' : 'Sign in'}
         </button>
       </form>
     </div>
   );
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  page: {
-    minHeight: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    background: 'var(--color-primary)',
-    padding: '1rem',
-  },
-  card: {
-    width: '100%',
-    maxWidth: 360,
-    background: 'var(--color-surface)',
-    borderRadius: 'var(--radius-md)',
-    boxShadow: 'var(--shadow-md)',
-    padding: '2rem',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  title: { margin: 0, textAlign: 'center' },
-  subtitle: { marginTop: 4, marginBottom: 24, textAlign: 'center', color: 'var(--color-text-muted)' },
-  label: { fontWeight: 600, marginBottom: 4, marginTop: 12 },
-  error: { color: 'var(--color-danger)', marginTop: 12, fontSize: 13 },
-  submit: { marginTop: 20 },
-};

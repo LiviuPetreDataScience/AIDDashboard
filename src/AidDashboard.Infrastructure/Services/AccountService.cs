@@ -17,11 +17,32 @@ public class AccountService : IAccountService
 
     public async Task<IReadOnlyList<AccountSummaryDto>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return await _dbContext.Accounts
+        var accounts = await _dbContext.Accounts
             .AsNoTracking()
-            .OrderBy(account => account.Name)
-            .Select(account => new AccountSummaryDto(account.Id, account.Name))
+            .Select(account => new { account.Id, account.Name, account.CreatedAtUtc, account.ModifiedAtUtc })
             .ToListAsync(cancellationToken);
+
+        // The latest recorded change per account, across all its tabs (from the change history).
+        var latestChangePerAccount = (await _dbContext.ChangeLogs
+                .AsNoTracking()
+                .Where(log => log.AccountId != null)
+                .GroupBy(log => log.AccountId!.Value)
+                .Select(group => new { AccountId = group.Key, Latest = group.Max(log => log.ChangedAtUtc) })
+                .ToListAsync(cancellationToken))
+            .ToDictionary(entry => entry.AccountId, entry => entry.Latest);
+
+        return accounts
+            .Select(account =>
+            {
+                var lastUpdated = account.ModifiedAtUtc ?? account.CreatedAtUtc;
+                if (latestChangePerAccount.TryGetValue(account.Id, out var latestChange) && latestChange > lastUpdated)
+                {
+                    lastUpdated = latestChange;
+                }
+                return new AccountSummaryDto(account.Id, account.Name, lastUpdated);
+            })
+            .OrderBy(account => account.Name)
+            .ToList();
     }
 
     public async Task<AccountSummaryDto> CreateAsync(CreateAccountRequest request, CancellationToken cancellationToken = default)
@@ -29,7 +50,7 @@ public class AccountService : IAccountService
         var account = new Account { Name = request.Name.Trim() };
         _dbContext.Accounts.Add(account);
         await _dbContext.SaveChangesAsync(cancellationToken);
-        return new AccountSummaryDto(account.Id, account.Name);
+        return new AccountSummaryDto(account.Id, account.Name, account.CreatedAtUtc);
     }
 
     public async Task<AccountOverallDto?> GetOverallAsync(int accountId, CancellationToken cancellationToken = default)

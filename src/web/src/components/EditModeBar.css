@@ -1,12 +1,18 @@
 .edit-bar {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.3rem;
+}
+
+.edit-bar-buttons {
+  display: flex;
   gap: 0.5rem;
 }
 
 .edit-bar-hint {
   color: var(--color-text-muted);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
 }
 
 .edit-bar-readonly {
