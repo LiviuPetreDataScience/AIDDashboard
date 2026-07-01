@@ -8,6 +8,8 @@ publish/
 *.db
 *.db-shm
 *.db-wal
+# ...except the seeded sample database, committed so the app ships with demo data.
+!src/AidDashboard.Api/aid-dashboard.db
 
 # Node / Vite
 node_modules/
